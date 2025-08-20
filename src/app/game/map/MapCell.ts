@@ -40,6 +40,8 @@ export class MapCell extends Graphics {
         return 0x90EE90; // Verde chiaro
       case BiomeType.FOREST:
         return 0x228B22; // Verde foresta
+      case BiomeType.SAND:
+        return 0xf2df8a; // Giallo chiaro
       case BiomeType.WATER:
         return 0x4287f5; // Blu acqua
       default:
@@ -47,9 +49,9 @@ export class MapCell extends Graphics {
     }
   }
 
-  public getBiome(): BiomeType {
-    return this.biomeType;
-  }
+  // public getBiome(): BiomeType {
+  //   return this.biomeType;
+  // }
 
   /** Dice se la cella è attraversabile */
   public isWalkable(): boolean {

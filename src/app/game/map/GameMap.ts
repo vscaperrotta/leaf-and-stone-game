@@ -1,4 +1,5 @@
 import { Container } from "pixi.js";
+import { createNoise2D } from "simplex-noise";
 import { BiomeType } from "./BiomeType";
 import { MapCell } from "./MapCell";
 
@@ -21,11 +22,17 @@ export class GameMap extends Container {
   }
 
   private generateMap(width: number, height: number) {
+    const noise2D = createNoise2D();
+    const scale = 0.1; // Controlla la "zoomata" del noise (valori più bassi = pattern più ampi)
+
     for (let y = 0; y < height; y++) {
       this.cells[y] = [];
       for (let x = 0; x < width; x++) {
-        // Per ora generiamo biomi casuali
-        const biomeType = this.getRandomBiome();
+        // Genera un valore di rumore tra -1 e 1
+        const noiseValue = noise2D(x * scale, y * scale);
+        // Mappa il valore di rumore a un bioma
+        const biomeType = this.getBiomeFromNoise(noiseValue);
+
         const cell = new MapCell(x, y, this.cellSize, biomeType);
         this.cells[y][x] = cell;
         this.addChild(cell);
@@ -33,13 +40,21 @@ export class GameMap extends Container {
     }
   }
 
-  private getRandomBiome(): BiomeType {
-    const biomes = [
-      BiomeType.GRASS,
-      BiomeType.FOREST,
-      BiomeType.WATER
-    ];
-    return biomes[Math.floor(Math.random() * biomes.length)];
+  /*
+   * Genera un bioma sulla base di un noise value
+   * Mappa i valori di rumore (-1 to 1) ai biomi
+   */
+  private getBiomeFromNoise(noiseValue: number): BiomeType {
+    // Puoi regolare questi valori per ottenere distribuzioni diverse
+    if (noiseValue < -0.6) {
+      return BiomeType.WATER;
+    } else if (noiseValue < -0.5) {
+      return BiomeType.SAND;
+    } else if (noiseValue < 0.4) {
+      return BiomeType.GRASS;
+    } else {
+      return BiomeType.FOREST;
+    }
   }
 
   public resize(screenWidth: number, screenHeight: number) {

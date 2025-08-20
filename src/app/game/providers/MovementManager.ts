@@ -1,6 +1,6 @@
 import { Container } from "pixi.js";
-import { GameMap } from "../../game/map/GameMap";
-import { GameUnit } from "../../game/unit/GameUnit";
+import { GameMap } from "../map/GameMap";
+import { GameUnit } from "../unit/GameUnit";
 
 
 export class MovementManager extends Container {
