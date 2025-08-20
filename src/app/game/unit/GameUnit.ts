@@ -1,16 +1,17 @@
 import { Container, FederatedPointerEvent } from "pixi.js";
 import { UnitType } from "./UnitType";
 import { UnitCell } from "./UnitCell";
-import { MovementManager } from "../../providers/MovementManager ";
 
 export class GameUnit extends Container {
   private units: UnitCell[] = [];
   private cellSize: number;
-  private movement?: MovementManager;
   public selectedUnit: UnitCell | null = null;
 
-  constructor(x: number, y: number, cellSize: number, quantity: number) {
+  constructor(cellSize: number, quantity: number) {
     super();
+
+    const x = 0;
+    const y = 0;
 
     this.cellSize = cellSize;
     this.x = x * cellSize;
@@ -76,8 +77,4 @@ export class GameUnit extends Container {
       this.emit('selectionChanged', this.selectedUnit);
     }
   }
-
-  // public setMovementManager(m: MovementManager) {
-  //   this.movement = m;
-  // }
 }

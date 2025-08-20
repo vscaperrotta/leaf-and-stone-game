@@ -4,7 +4,7 @@ import { engine } from "../getEngine";
 import { PausePopup } from "../popups/PausePopup";
 import { SettingsPopup } from "../popups/SettingsPopup";
 
-export class TemporaryActions extends Container {
+export class PopupActions extends Container {
   private pauseButton: FancyButton;
   private settingsButton: FancyButton;
 

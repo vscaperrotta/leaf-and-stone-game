@@ -7,12 +7,17 @@ import { engine } from "../../getEngine";
 
 import { GameMap } from "../../game/map/GameMap";
 import { GameUnit } from "../../game/unit/GameUnit";
-import { UnitCell } from "../../game/unit/UnitCell";
 
-import { TemporaryActions } from "../../actions/temporary_actions";
+import { PopupActions } from "../../actions/popup_actions";
 import { PausePopup } from "../../popups/PausePopup";
 
-import { MovementManager } from '../../providers/MovementManager ';
+import { MovementManager } from '../../controls/MovementManager';
+import { MovementTracker } from '../../controls/MovementTracker';
+
+// Number of tiles in each direction
+const TILES_NUMBER = 17;
+// Numero di unità da generare
+const unitsQuantity = 3;
 
 /** The screen that holds the app */
 export class MainScreen extends Container {
@@ -22,9 +27,9 @@ export class MainScreen extends Container {
   public mainContainer: Container;
   private gameMap: GameMap;
   private movement!: MovementManager;
-  private selectedUnit: UnitCell | null = null;
+  private movementTacker!: MovementTracker;
 
-  private actions: TemporaryActions;
+  private actions: PopupActions;
   private paused = false;
 
   constructor() {
@@ -36,36 +41,30 @@ export class MainScreen extends Container {
     this.mainContainer = new Container();
     this.addChild(this.mainContainer);
 
-    // Crea la mappa di gioco (32x32 celle)
     const app = engine();
     const screenWidth = app.screen.width;
     const screenHeight = app.screen.height;
-    this.gameMap = new GameMap(16, 16, screenWidth, screenHeight);
-    this.mainContainer.addChild(this.gameMap);
 
+    // Creazione mappa
+    this.gameMap = new GameMap(TILES_NUMBER, TILES_NUMBER, screenWidth, screenHeight);
+    this.mainContainer.addChild(this.gameMap);
     const cellSize = this.gameMap.cellSize;
-    // Numero di unità da generare
-    const unitsQuantity = 3;
+
 
     // Creazione unità di gioco
-    // Posizione fissa per ora
-    const x = 0;
-    const y = 0;
-    const gameUnit = new GameUnit(x, y, cellSize, unitsQuantity);
+    const gameUnit = new GameUnit(cellSize, unitsQuantity);
     this.mainContainer.addChild(gameUnit);
 
+    // Movement Manager
     this.movement = new MovementManager(this.gameMap);
     this.gameMap.setMovementManager(this.movement);
-    // gameUnit.setMovementManager(this.movement);
 
-    // Ascolta i cambiamenti di selezione
-    gameUnit.on('selectionChanged', (unit: UnitCell | null) => {
-      this.selectedUnit = unit;
-      this.gameMap.setSelectedUnit(unit);
-    });
+    // Movement Tracker
+    this.movementTacker = new MovementTracker(this.gameMap, gameUnit);
+    this.movementTacker.setupEventListeners();
 
     // Popup
-    this.actions = new TemporaryActions();
+    this.actions = new PopupActions();
     this.addChild(this.actions);
   }
 

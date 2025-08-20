@@ -1,4 +1,3 @@
-// MovementManager.ts
 import { Container, Point } from "pixi.js";
 import { GameMap } from "../game/map/GameMap";
 import { findPathAStar, GridPos } from "../game/utils/astar";

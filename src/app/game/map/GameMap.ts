@@ -2,7 +2,7 @@ import { Container, Point, FederatedPointerEvent } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 import { BiomeType } from "./BiomeType";
 import { MapCell } from "./MapCell";
-import { MovementManager } from "../../providers/MovementManager ";
+import { MovementManager } from "../../controls/MovementManager";
 import { UnitCell } from "../unit/UnitCell";
 
 export class GameMap extends Container {
@@ -68,16 +68,14 @@ export class GameMap extends Container {
     for (let y = 0; y < height; y++) {
       this.cells[y] = [];
       for (let x = 0; x < width; x++) {
-        // Genera un valore di rumore tra -1 e 1
         const noiseValue = noise2D(x * scale, y * scale);
-        // Mappa il valore di rumore a un bioma
         const biomeType = this.getBiomeFromNoise(noiseValue);
-
         const cell = new MapCell(x, y, this.cellSize, biomeType);
         this.cells[y][x] = cell;
         this.addChild(cell);
       }
     }
+    console.log(this.cells)
   }
 
   // Genera un bioma sulla base di un noise value

@@ -41,9 +41,9 @@ export class UnitCell extends Graphics {
   private getUnitColor(unitType: UnitType): number {
     switch (unitType) {
       case UnitType.CITIZEN:
-        return 0xFFA500; // Arancione per i cittadini
+        return 0xFF0000;
       default:
-        return 0x808080; // Grigio come fallback
+        return 0x808080; // Fallback
     }
   }
 
