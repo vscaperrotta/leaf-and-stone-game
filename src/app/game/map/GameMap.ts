@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { Container, Point } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 import { BiomeType } from "./BiomeType";
 import { MapCell } from "./MapCell";
@@ -8,6 +8,7 @@ export class GameMap extends Container {
   private mapWidth: number;   // larghezza della mappa in pixel
   private mapHeight: number;  // altezza della mappa in pixel
   public cellSize: number;    // dimensione calcolata delle celle
+  private glowOverlay: MapCell | null = null;
 
   constructor(cellsX: number, cellsY: number, screenWidth: number, screenHeight: number) {
     super();
@@ -22,7 +23,18 @@ export class GameMap extends Container {
       this.mapHeight / cellsY
     );
 
+    // Rendi il container interattivo per catturare gli eventi
+    this.eventMode = 'static';
+
     this.generateMap(cellsX, cellsY);
+
+    this.setupEventListeners();
+  }
+
+  private setupEventListeners() {
+    this.on('click', this.debugCell, this);
+    this.on('mousemove', this.glowCell, this);
+    this.on('mouseout', this.removeGlow, this);
   }
 
   private generateMap(width: number, height: number) {
@@ -44,10 +56,8 @@ export class GameMap extends Container {
     }
   }
 
-  /*
-   * Genera un bioma sulla base di un noise value
-   * Mappa i valori di rumore (-1 to 1) ai biomi
-   */
+  // Genera un bioma sulla base di un noise value
+  // Mappa i valori di rumore (-1 to 1) ai biomi
   private getBiomeFromNoise(noiseValue: number): BiomeType {
     // Puoi regolare questi valori per ottenere distribuzioni diverse
     if (noiseValue < -0.6) {
@@ -61,15 +71,87 @@ export class GameMap extends Container {
     }
   }
 
-  public resize(screenWidth: number, screenHeight: number) {
-    // Centra la mappa sullo schermo
-    this.x = (screenWidth - this.mapWidth) / 2;
-    this.y = (screenHeight - this.mapHeight) / 2;
+  // Ritorna la posizione in px e della tile
+  private debugCell(event: any) {
+    const gridPosition = this.worldToGrid({
+      x: event.data.global.x,
+      y: event.data.global.y
+    });
+    const worldPosition = this.gridToWorld({
+      x: gridPosition.x,
+      y: gridPosition.y
+    }, "center");
+    console.log(`Grid position: ${gridPosition.x}, ${gridPosition.y}`);
+    console.log(`World position: ${worldPosition.x}, ${worldPosition.y}`);
+  }
+
+  private removeGlow() {
+    if (this.glowOverlay) {
+      this.removeChild(this.glowOverlay);
+      this.glowOverlay = null;
+    }
+  }
+
+  private glowCell(event: any) {
+    const localPoint = event.data.getLocalPosition(this);
+
+    // Verifica se il mouse è all'interno dell'area della mappa
+    if (localPoint.x >= 0 && localPoint.x < this.mapWidth &&
+      localPoint.y >= 0 && localPoint.y < this.mapHeight) {
+
+      const gridPosition = {
+        x: Math.floor(localPoint.x / this.cellSize),
+        y: Math.floor(localPoint.y / this.cellSize)
+      };
+
+      // Rimuovi il glow precedente se esiste
+      this.removeGlow();
+
+      // Crea un nuovo glow nella posizione corretta
+      this.glowOverlay = new MapCell(gridPosition.x, gridPosition.y, this.cellSize, BiomeType.NONE);
+      this.addChild(this.glowOverlay);
+    } else {
+      // Se il mouse è fuori dalla mappa, rimuovi il glow
+      this.removeGlow();
+    }
   }
 
   public getGrid(): number[][] {
     return this.cells.map(row =>
       row.map(cell => (cell.isWalkable() ? 0 : 1))
     );
+  }
+
+  public worldToGrid(worldPos: { x: number; y: number }) {
+    // Converte coordinate globali in coordinate locali rispetto alla mappa
+    const local = this.toLocal(worldPos);
+
+    const col = Math.floor(local.x / this.cellSize);
+    const row = Math.floor(local.y / this.cellSize);
+
+    return { x: col, y: row };
+  }
+
+  public gridToWorld(gridPos: { x: number; y: number }, anchor: "center" | "topleft" = "center") {
+    const baseX = gridPos.x * this.cellSize;
+    const baseY = gridPos.y * this.cellSize;
+
+    let worldX: number;
+    let worldY: number;
+
+    if (anchor === "center") {
+      worldX = baseX + this.cellSize / 2;
+      worldY = baseY + this.cellSize / 2;
+    } else {
+      worldX = baseX;
+      worldY = baseY;
+    }
+
+    const point = new Point(worldX, worldY);
+
+    // Converte coordinate locali della mappa in globali
+    const global = this.toGlobal(point);
+
+    return { x: global.x, y: global.y };
   }
 }

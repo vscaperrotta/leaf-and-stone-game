@@ -22,7 +22,12 @@ export class GameUnit extends Container {
   }
 
   private generateUnits(quantity: number) {
-    const spacing = this.cellSize / (quantity + 1);
+    // const spacing = this.cellSize / (quantity + 1);
+    const spacing = this.cellSize;
+
+    console.log('Generating units with spacing:', spacing);
+    console.log('Cell size:', this.cellSize);
+    console.log('Quantity:', quantity);
 
     for (let i = 0; i < quantity; i++) {
       const unit = new UnitCell(0, 0, this.cellSize * 0.4, UnitType.CITIZEN);

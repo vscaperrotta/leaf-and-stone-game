@@ -4,34 +4,51 @@ import { BiomeType } from "./BiomeType";
 export class MapCell extends Graphics {
   private readonly biomeType: BiomeType;
   private readonly cellSize: number;
+  private readonly isGlowEffect: boolean;
 
   constructor(x: number, y: number, size: number, biomeType: BiomeType) {
     super();
 
     this.biomeType = biomeType;
     this.cellSize = size;
+    this.isGlowEffect = biomeType === BiomeType.NONE;
 
     // Posiziona la cella
     this.x = x * size;
     this.y = y * size;
 
-    this.draw();
+    this.render();
   }
 
-  private draw() {
+  private render() {
     this.clear();
 
-    // Colora la cella in base al bioma
-    this.fill(this.getBiomeColor(this.biomeType));
-    this.rect(0, 0, this.cellSize, this.cellSize);
-    this.fill();
+    if (this.isGlowEffect) {
+      // Disegna l'effetto glow
+      this.fill({
+        color: 0xffffff,
+        alpha: 0.4,
+      });
+      this.rect(0, 0, this.cellSize, this.cellSize);
+      this.fill();
+      this.stroke({
+        width: 2,
+        color: 0xffffff,
+        alpha: 0.6
+      });
+    } else {
+      // Disegna la cella normale con il bioma
+      this.fill(this.getBiomeColor(this.biomeType));
+      this.rect(0, 0, this.cellSize, this.cellSize);
+      this.fill();
 
-    // Aggiungi sempre un bordo sottile per la griglia
-    this.stroke({
-      width: 1,
-      color: 0x000000
-    });
-    this.rect(0, 0, this.cellSize, this.cellSize);
+      // Aggiungi sempre un bordo sottile per la griglia
+      this.stroke({
+        width: 1,
+        color: 0x000000
+      });
+      this.rect(0, 0, this.cellSize, this.cellSize);
+    }
   }
 
   private getBiomeColor(biomeType: BiomeType): number {

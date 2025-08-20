@@ -33,15 +33,16 @@ export class MainScreen extends Container {
     const app = engine();
     const screenWidth = app.screen.width;
     const screenHeight = app.screen.height;
-    this.gameMap = new GameMap(32, 32, screenWidth, screenHeight);
+    this.gameMap = new GameMap(16, 16, screenWidth, screenHeight);
     this.mainContainer.addChild(this.gameMap);
 
+    const cellSize = this.gameMap.cellSize;
+    const unitsQuantity = 3; // Numero di unità da generare
+
     // Creazione unità di gioco
-    // const x = Math.floor(Math.random() * this.gameMap.width / 52);
-    // const y = Math.floor(Math.random() * this.gameMap.height / 52);
     const x = 0; // Posizione fissa per ora
     const y = 0; // Posizione fissa per ora
-    const gameUnit = new GameUnit(x, y, 52, 1);
+    const gameUnit = new GameUnit(x, y, cellSize, unitsQuantity);
     this.mainContainer.addChild(gameUnit);
 
     // Crea il gestore delle azioni temporanee (pulsanti pausa e impostazioni)

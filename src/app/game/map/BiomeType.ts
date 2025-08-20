@@ -1,6 +1,7 @@
 export enum BiomeType {
-  SAND,
+  NONE,
   GRASS,
   FOREST,
+  SAND,
   WATER,
 }
