@@ -3,12 +3,16 @@ import type { AnimationPlaybackControls } from "motion/react";
 import type { Ticker } from "pixi.js";
 import { Container } from "pixi.js";
 
-import { TemporaryActions } from "../../actions/temporary_actions";
 import { engine } from "../../getEngine";
+
 import { GameMap } from "../../game/map/GameMap";
 import { GameUnit } from "../../game/unit/GameUnit";
+import { UnitCell } from "../../game/unit/UnitCell";
 
+import { TemporaryActions } from "../../actions/temporary_actions";
 import { PausePopup } from "../../popups/PausePopup";
+
+import { MovementManager } from '../../providers/MovementManager ';
 
 /** The screen that holds the app */
 export class MainScreen extends Container {
@@ -17,6 +21,9 @@ export class MainScreen extends Container {
 
   public mainContainer: Container;
   private gameMap: GameMap;
+  private movement!: MovementManager;
+  private selectedUnit: UnitCell | null = null;
+
   private actions: TemporaryActions;
   private paused = false;
 
@@ -37,15 +44,27 @@ export class MainScreen extends Container {
     this.mainContainer.addChild(this.gameMap);
 
     const cellSize = this.gameMap.cellSize;
-    const unitsQuantity = 3; // Numero di unità da generare
+    // Numero di unità da generare
+    const unitsQuantity = 3;
 
     // Creazione unità di gioco
-    const x = 0; // Posizione fissa per ora
-    const y = 0; // Posizione fissa per ora
+    // Posizione fissa per ora
+    const x = 0;
+    const y = 0;
     const gameUnit = new GameUnit(x, y, cellSize, unitsQuantity);
     this.mainContainer.addChild(gameUnit);
 
-    // Crea il gestore delle azioni temporanee (pulsanti pausa e impostazioni)
+    this.movement = new MovementManager(this.gameMap);
+    this.gameMap.setMovementManager(this.movement);
+    // gameUnit.setMovementManager(this.movement);
+
+    // Ascolta i cambiamenti di selezione
+    gameUnit.on('selectionChanged', (unit: UnitCell | null) => {
+      this.selectedUnit = unit;
+      this.gameMap.setSelectedUnit(unit);
+    });
+
+    // Popup
     this.actions = new TemporaryActions();
     this.addChild(this.actions);
   }
@@ -54,10 +73,10 @@ export class MainScreen extends Container {
   public prepare() { }
 
   /** Update the screen */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public update(_time: Ticker) {
+  public update(ticker: Ticker) {
     if (this.paused) return;
-    // Per ora non abbiamo niente da aggiornare
+    const dt = (ticker as Ticker).deltaMS ? (ticker as Ticker).deltaMS / 1000 : 1 / 60;
+    this.movement.update(dt);
   }
 
   /** Pause gameplay - automatically fired when a popup is presented */

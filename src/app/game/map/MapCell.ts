@@ -11,9 +11,9 @@ export class MapCell extends Graphics {
 
     this.biomeType = biomeType;
     this.cellSize = size;
-    this.isGlowEffect = biomeType === BiomeType.NONE;
+    this.isGlowEffect = biomeType === BiomeType.GLOW;
 
-    // Posiziona la cella
+    // Posizoine della cella
     this.x = x * size;
     this.y = y * size;
 
@@ -23,40 +23,37 @@ export class MapCell extends Graphics {
   private render() {
     this.clear();
 
+    this.rect(0, 0, this.cellSize, this.cellSize);
+
     if (this.isGlowEffect) {
-      // Disegna l'effetto glow
-      this.fill({
-        color: 0xffffff,
-        alpha: 0.4,
-      });
-      this.rect(0, 0, this.cellSize, this.cellSize);
-      this.fill();
-      this.stroke({
-        width: 2,
-        color: 0xffffff,
-        alpha: 0.6
-      });
+      // Disegna un leggere layer bianco sopra la cella dove passo con il mouse
+      this.drawGlow();
     } else {
       // Disegna la cella normale con il bioma
-      this.fill(this.getBiomeColor(this.biomeType));
-      this.rect(0, 0, this.cellSize, this.cellSize);
-      this.fill();
-
-      // Aggiungi sempre un bordo sottile per la griglia
-      this.stroke({
-        width: 1,
-        color: 0x000000
-      });
-      this.rect(0, 0, this.cellSize, this.cellSize);
+      this.draw();
     }
+  }
+
+  private draw() {
+    this.fill(this.getBiomeColor(this.biomeType));
+  }
+
+  private drawGlow() {
+    this.fill({
+      color: 0xffffff,
+      alpha: 0.4,
+    });
+    this.stroke({
+      width: 2,
+      color: 0xffffff,
+      alpha: 0.6
+    });
   }
 
   private getBiomeColor(biomeType: BiomeType): number {
     switch (biomeType) {
       case BiomeType.GRASS:
         return 0x90EE90; // Verde chiaro
-      case BiomeType.FOREST:
-        return 0x228B22; // Verde foresta
       case BiomeType.SAND:
         return 0xf2df8a; // Giallo chiaro
       case BiomeType.WATER:
@@ -66,17 +63,19 @@ export class MapCell extends Graphics {
     }
   }
 
-  // public getBiome(): BiomeType {
-  //   return this.biomeType;
-  // }
-
-  /** Dice se la cella è attraversabile */
+  // Definisce se la cella è attraversabile o no
   public isWalkable(): boolean {
     switch (this.biomeType) {
+      // Questi sono elementi non attraversabili
       case BiomeType.WATER:
-        return false; // acqua = bloccata
+        return false;
+      // Tutto il resto è attraversabile
       default:
-        return true;  // il resto = libero
+        return true;
     }
+  }
+
+  public getBiomeType(): BiomeType {
+    return this.biomeType;
   }
 }

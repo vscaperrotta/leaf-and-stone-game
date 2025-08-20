@@ -57,10 +57,6 @@ export class UnitCell extends Graphics {
     this.draw();
   }
 
-  public isUnit(): boolean {
-    return true;
-  }
-
   public getUnitType(): UnitType {
     return this.unitType;
   }

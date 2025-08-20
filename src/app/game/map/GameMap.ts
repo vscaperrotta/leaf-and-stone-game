@@ -2,13 +2,17 @@ import { Container, Point, FederatedPointerEvent } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 import { BiomeType } from "./BiomeType";
 import { MapCell } from "./MapCell";
+import { MovementManager } from "../../providers/MovementManager ";
+import { UnitCell } from "../unit/UnitCell";
 
 export class GameMap extends Container {
   private cells: MapCell[][] = [];
-  private mapWidth: number;   // larghezza della mappa in pixel
-  private mapHeight: number;  // altezza della mappa in pixel
-  public cellSize: number;    // dimensione calcolata delle celle
+  private mapWidth: number;
+  private mapHeight: number;
+  public cellSize: number;
   private glowOverlay: MapCell | null = null;
+  private movement?: MovementManager;
+  private selectedUnit: UnitCell | null = null;
 
   constructor(cellsX: number, cellsY: number, screenWidth: number, screenHeight: number) {
     super();
@@ -35,11 +39,31 @@ export class GameMap extends Container {
     this.on('click', this.debugCell, this);
     this.on('mousemove', this.glowCell, this);
     this.on('mouseout', this.removeGlow, this);
+    this.on('rightclick', this.handleRightClick, this);
+  }
+
+  public setMovementManager(movement: MovementManager) {
+    this.movement = movement;
+  }
+
+  public setSelectedUnit(unit: UnitCell | null) {
+    this.selectedUnit = unit;
+  }
+
+  private handleRightClick(event: FederatedPointerEvent) {
+    if (this.selectedUnit && this.movement && event.button === 2) {
+      const goalWorld = {
+        x: event.global.x,
+        y: event.global.y,
+      };
+      this.movement.issueMoveToWorld(this.selectedUnit, goalWorld);
+    }
   }
 
   private generateMap(width: number, height: number) {
     const noise2D = createNoise2D();
-    const scale = 0.1; // Controlla la "zoomata" del noise (valori più bassi = pattern più ampi)
+    // Controlla la "zoomata" del noise (valori più bassi = pattern più ampi)
+    const scale = 0.1;
 
     for (let y = 0; y < height; y++) {
       this.cells[y] = [];
@@ -64,10 +88,8 @@ export class GameMap extends Container {
       return BiomeType.WATER;
     } else if (noiseValue < -0.5) {
       return BiomeType.SAND;
-    } else if (noiseValue < 0.4) {
-      return BiomeType.GRASS;
     } else {
-      return BiomeType.FOREST;
+      return BiomeType.GRASS;
     }
   }
 
@@ -81,8 +103,8 @@ export class GameMap extends Container {
       x: gridPosition.x,
       y: gridPosition.y
     }, "center");
-    console.log(`Grid position: ${gridPosition.x}, ${gridPosition.y}`);
-    console.log(`World position: ${worldPosition.x}, ${worldPosition.y}`);
+    console.log(`debugCell: Grid position: ${gridPosition.x}, ${gridPosition.y}`);
+    console.log(`debugCell: World position: ${worldPosition.x}, ${worldPosition.y}`);
   }
 
   private removeGlow() {
@@ -108,7 +130,12 @@ export class GameMap extends Container {
       this.removeGlow();
 
       // Crea un nuovo glow nella posizione corretta
-      this.glowOverlay = new MapCell(gridPosition.x, gridPosition.y, this.cellSize, BiomeType.NONE);
+      this.glowOverlay = new MapCell(
+        gridPosition.x,
+        gridPosition.y,
+        this.cellSize,
+        BiomeType.GLOW
+      );
       this.addChild(this.glowOverlay);
     } else {
       // Se il mouse è fuori dalla mappa, rimuovi il glow
