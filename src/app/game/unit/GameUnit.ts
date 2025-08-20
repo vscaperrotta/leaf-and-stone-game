@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { Container, FederatedPointerEvent } from "pixi.js";
 import { UnitType } from "./UnitType";
 import { UnitCell } from "./UnitCell";
 
@@ -48,13 +48,13 @@ export class GameUnit extends Container {
     this.on('rightclick', this.onUnitRightClick, this);
   }
 
-  private onUnitRightClick(event: any) {
+  private onUnitRightClick(event: FederatedPointerEvent) {
     console.log("UnitCell: Right click detected");
     // Se non c'è un'unità selezionata, non fare nulla
     if (!this.selectedUnit) return;
 
     // Ottieni le coordinate globali del click
-    const globalPoint = event.data.global;
+    const globalPoint = event.global;
 
     // Converti le coordinate globali in coordinate della griglia
     const gridX = Math.floor(globalPoint.x / this.cellSize);
@@ -66,10 +66,10 @@ export class GameUnit extends Container {
     this.moveTo(gridX, gridY);
   }
 
-  private onUnitClick(event: any) {
+  private onUnitClick(event: FederatedPointerEvent) {
     // Trova l'unità cliccata
     const clickedUnit = this.units.find(unit => {
-      const globalPoint = event.data.global;
+      const globalPoint = event.global;
       const localPoint = unit.toLocal(globalPoint);
       // Verifica se il punto è all'interno del cerchio dell'unità
       const radius = (this.cellSize * 0.4) / 2; // Il raggio è la metà della dimensione dell'unità

@@ -1,4 +1,4 @@
-import { Container, Point } from "pixi.js";
+import { Container, Point, FederatedPointerEvent } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 import { BiomeType } from "./BiomeType";
 import { MapCell } from "./MapCell";
@@ -72,10 +72,10 @@ export class GameMap extends Container {
   }
 
   // Ritorna la posizione in px e della tile
-  private debugCell(event: any) {
+  private debugCell(event: FederatedPointerEvent) {
     const gridPosition = this.worldToGrid({
-      x: event.data.global.x,
-      y: event.data.global.y
+      x: event.global.x,
+      y: event.global.y
     });
     const worldPosition = this.gridToWorld({
       x: gridPosition.x,
@@ -92,8 +92,8 @@ export class GameMap extends Container {
     }
   }
 
-  private glowCell(event: any) {
-    const localPoint = event.data.getLocalPosition(this);
+  private glowCell(event: FederatedPointerEvent) {
+    const localPoint = event.getLocalPosition(this);
 
     // Verifica se il mouse è all'interno dell'area della mappa
     if (localPoint.x >= 0 && localPoint.x < this.mapWidth &&

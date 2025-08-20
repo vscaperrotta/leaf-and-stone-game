@@ -47,7 +47,9 @@ export class TemporaryActions extends Container {
     this.addChild(this.settingsButton);
   }
 
-  public resize(width: number, height: number) {
+  public resize(
+    width: number
+  ) {
     this.pauseButton.x = 30;
     this.pauseButton.y = 30;
     this.settingsButton.x = width - 30;

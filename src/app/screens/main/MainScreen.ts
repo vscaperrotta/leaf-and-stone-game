@@ -78,7 +78,7 @@ export class MainScreen extends Container {
   /** Resize the screen, fired whenever window size changes */
   public resize(width: number, height: number) {
     // Aggiorna la posizione dei pulsanti
-    this.actions.resize(width, height);
+    this.actions.resize(width);
 
     // Centra il container principale
     this.mainContainer.x = Math.floor(width * 0.5);
