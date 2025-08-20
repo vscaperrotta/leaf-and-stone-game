@@ -4,15 +4,18 @@ import { BiomeType } from "./BiomeType";
 import { MapCell } from "./MapCell";
 import { MovementManager } from "../../controls/MovementManager";
 import { UnitCell } from "../unit/UnitCell";
+import { BuildingCell } from "../building/BuildingCell";
 
 export class GameMap extends Container {
   private cells: MapCell[][] = [];
+  private buildings: BuildingCell[][] = [];
   private mapWidth: number;
   private mapHeight: number;
   public cellSize: number;
   private glowOverlay: MapCell | null = null;
   private movement?: MovementManager;
   private selectedUnit: UnitCell | null = null;
+
 
   constructor(cellsX: number, cellsY: number, screenWidth: number, screenHeight: number) {
     super();
@@ -69,19 +72,34 @@ export class GameMap extends Container {
       this.cells[y] = [];
       for (let x = 0; x < width; x++) {
         const noiseValue = noise2D(x * scale, y * scale);
-        const biomeType = this.getBiomeFromNoise(noiseValue);
+        const biomeType = this.getBiomeFromNoise(noiseValue, x, y, width, height);
         const cell = new MapCell(x, y, this.cellSize, biomeType);
         this.cells[y][x] = cell;
         this.addChild(cell);
       }
     }
-    console.log(this.cells)
   }
 
   // Genera un bioma sulla base di un noise value
   // Mappa i valori di rumore (-1 to 1) ai biomi
-  private getBiomeFromNoise(noiseValue: number): BiomeType {
-    // Puoi regolare questi valori per ottenere distribuzioni diverse
+  private getBiomeFromNoise(noiseValue: number, x: number, y: number, width: number, height: number): BiomeType {
+    // Calcola le coordinate del centro della mappa
+    const centerX = Math.floor(width / 2);
+    const centerY = Math.floor(height / 2);
+
+    // Definisci il raggio dell'area centrale (3 tile dal centro)
+    const centerRadius = 3;
+
+    // Se siamo nell'area centrale, forza il bioma a GRASS
+    const distanceFromCenter = Math.sqrt(
+      Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
+    );
+
+    if (distanceFromCenter <= centerRadius) {
+      return BiomeType.GRASS;
+    }
+
+    // Per le altre aree, usa il noise per determinare il bioma
     if (noiseValue < -0.6) {
       return BiomeType.WATER;
     } else if (noiseValue < -0.5) {

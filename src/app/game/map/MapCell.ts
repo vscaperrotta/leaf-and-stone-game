@@ -13,7 +13,7 @@ export class MapCell extends Graphics {
     this.cellSize = size;
     this.isGlowEffect = biomeType === BiomeType.GLOW;
 
-    // Posizoine della cella
+    // Posizione della cella
     this.x = x * size;
     this.y = y * size;
 

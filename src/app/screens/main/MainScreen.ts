@@ -7,6 +7,7 @@ import { engine } from "../../getEngine";
 
 import { GameMap } from "../../game/map/GameMap";
 import { GameUnit } from "../../game/unit/GameUnit";
+// import { BuildingUnit } from "../../game/building/BuildingUnit";
 
 import { PopupActions } from "../../actions/popup_actions";
 import { PausePopup } from "../../popups/PausePopup";
@@ -50,6 +51,10 @@ export class MainScreen extends Container {
     this.mainContainer.addChild(this.gameMap);
     const cellSize = this.gameMap.cellSize;
 
+    // Creazione centro città
+    // const gameHall = new BuildingUnit(cellSize, 1);
+    // gameHall.generateBuildHall();
+    // this.mainContainer.addChild(gameHall);
 
     // Creazione unità di gioco
     const gameUnit = new GameUnit(cellSize, unitsQuantity);
