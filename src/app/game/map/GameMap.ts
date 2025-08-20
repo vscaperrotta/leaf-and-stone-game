@@ -5,12 +5,16 @@ import { MapCell } from "./MapCell";
 
 export class GameMap extends Container {
   private cells: MapCell[][] = [];
-  private readonly mapWidth = 960;  // larghezza fissa della mappa in pixel
-  private readonly mapHeight = 640; // altezza fissa della mappa in pixel
-  public cellSize: number;         // dimensione calcolata delle celle
+  private mapWidth: number;   // larghezza della mappa in pixel
+  private mapHeight: number;  // altezza della mappa in pixel
+  public cellSize: number;    // dimensione calcolata delle celle
 
-  constructor(cellsX: number, cellsY: number) {
+  constructor(cellsX: number, cellsY: number, screenWidth: number, screenHeight: number) {
     super();
+
+    // Usa le dimensioni dello schermo per la mappa
+    this.mapWidth = screenWidth;
+    this.mapHeight = screenHeight;
 
     // Calcola la dimensione delle celle basata sulla dimensione della mappa
     this.cellSize = Math.min(

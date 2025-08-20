@@ -29,8 +29,11 @@ export class MainScreen extends Container {
     this.mainContainer = new Container();
     this.addChild(this.mainContainer);
 
-    // Crea la mappa di gioco (32x24 celle per una risoluzione di 960x640)
-    this.gameMap = new GameMap(32, 24);
+    // Crea la mappa di gioco (32x32 celle)
+    const app = engine();
+    const screenWidth = app.screen.width;
+    const screenHeight = app.screen.height;
+    this.gameMap = new GameMap(32, 32, screenWidth, screenHeight);
     this.mainContainer.addChild(this.gameMap);
 
     // Creazione unità di gioco
