@@ -41,6 +41,8 @@ export class UnitCell extends Graphics {
   private getUnitColor(unitType: UnitType): number {
     switch (unitType) {
       case UnitType.CITIZEN:
+        return 0xf59b42;
+      case UnitType.HERO:
         return 0xFF0000;
       default:
         return 0x808080; // Fallback

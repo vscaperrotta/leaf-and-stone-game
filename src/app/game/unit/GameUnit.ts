@@ -38,6 +38,12 @@ export class GameUnit extends Container {
       this.units.push(unit);
       this.addChild(unit);
     }
+
+    const heroUnit = new UnitCell(0, 0, this.cellSize * 0.4, UnitType.HERO);
+    heroUnit.x = this.cellSize / 2 - heroUnit.width / 2;
+    heroUnit.y = this.cellSize / 2 - heroUnit.height / 2;
+    this.units.push(heroUnit);
+    this.addChild(heroUnit);
   }
 
   private setupEventListeners() {

@@ -1,3 +1,4 @@
 export enum UnitType {
-  CITIZEN
+  CITIZEN,
+  HERO
 }

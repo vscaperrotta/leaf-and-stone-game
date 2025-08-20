@@ -15,7 +15,7 @@ import { MovementManager } from '../../controls/MovementManager';
 import { MovementTracker } from '../../controls/MovementTracker';
 
 // Number of tiles in each direction
-const TILES_NUMBER = 17;
+const TILES_NUMBER = 21;
 // Numero di unità da generare
 const unitsQuantity = 3;
 
